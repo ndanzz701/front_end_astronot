@@ -8,6 +8,7 @@ import Question from './src/screen/Questions'
 import EndScreen from './src/screen/EndScreen'
 import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
+import Test from './src/screen/Questions/test'
 const base_url = require('./BASE_URL/BASE_URL')
 
 const FormUsers = createStackNavigator({
@@ -77,12 +78,16 @@ const reducer = (state=initialState,action)=>{
           answer: state.dataAnswer[0].answer,
           attachment: state.dataAnswer[0].attachment,
         }
+      }).then(function (response) {
+        for( var i = 0; i < state.dataAnswer.length; i++){ 
+          state.dataAnswer.splice(i, 1); 
+        }
+        console.log(state.dataAnswer);
       });
-  })
-    console.log(state.dataQuestion)
+    })
   }
   // console.log(state.dataAnswer)
-  console.log(state.dataQuestion)
+  console.log(state.dataAnswer)
 return state;
 }
 
@@ -92,7 +97,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <ShowScreen/>
+        <Test/>
       </Provider>
     );
   }

@@ -4,6 +4,8 @@ import CountDown from 'react-native-countdown-component';
 import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 import {connect} from 'react-redux'
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import MultiSelect from 'react-native-multiple-select';
+
 class Question extends Component {
   constructor(props) {
     super(props);
@@ -11,8 +13,7 @@ class Question extends Component {
         screen:this.props.navigation.getParam('screen'),
         attachment:'',
         dataRadio:[],
-        answer:'',
-        answerRadio:0
+        selectedItems:[],
     };
   }
 
@@ -24,6 +25,18 @@ dataRadioButton(id){
       dataku.splice(1, 0, {"label":data,"value":index});
         // this.state.dataRadio.push({"label":data,"value":index})
     })
+    console.log(dataku)
+    return dataku
+}
+dataMultiSelect(id){
+    const dataku=[]
+    const str = this.props.dataQuestion[id].options;
+    const res = str.split(",");
+    res.map((data,index)=>{
+      dataku.splice(1, 0, {"id":`${index}`,"name":data});
+        // this.state.dataRadio.push({"label":data,"value":index})
+    })
+    console.log(dataku)
     return dataku
 }
 
@@ -31,25 +44,31 @@ dataRadioButton(id){
     const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answer,"attachment":this.state.attachment}
     this.props.dispatch({type:'SaveAnswer',payload:datauser})
   }
-  _saveAnswerRadio(id){
-    const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answerRadio,"attachment":this.state.attachment}
-    this.props.dispatch({type:'SaveAnswer',payload:datauser})
+  _nextButton(){
+    if(this.props.indexQuestion.includes(this.state.screen+1)){
+      return(
+        this._saveAnswer(this.state.screen),this.props.navigation.dispatch(
+          StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'Question',params:{screen:this.state.screen+1} })]
+          })
+        )
+      )
+    }else{
+      return(
+        this.props.navigation.replace('EndScreen')
+      )
+    }
   }
+  // _saveAnswerRadio(id){
+  //   const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answerRadio,"attachment":this.state.attachment}
+  //   this.props.dispatch({type:'SaveAnswer',payload:datauser})
+  // }
   _question(id){
     if(this.props.dataQuestion[id].type == 'text'){
         return(
             <View>
                 <TextInput onChangeText={(answer)=>{this.setState({answer})}}/>
-                {this.props.indexQuestion.includes(this.state.screen+1) ? <TouchableOpacity onPress={()=>{this._saveAnswer(this.state.screen),this.props.navigation.dispatch(
-              StackActions.reset({
-                index: 0,
-                actions: [NavigationActions.navigate({ routeName: 'Question',params:{screen:this.state.screen+1} })]
-              })
-            )}}>
-        <Text>{this.state.screen}</Text>
-    </TouchableOpacity> : <TouchableOpacity onPress={()=>{this.props.navigation.replace('EndScreen')}}>
-        <Text>{this.state.screen}</Text>
-    </TouchableOpacity>}
             </View>
         )
     }else if(this.props.dataQuestion[id].type == 'multiple choice'){
@@ -58,31 +77,48 @@ dataRadioButton(id){
             <View>
             <RadioForm
               radio_props={this.dataRadioButton(this.state.screen)}
-              initial={0}
-              onPress={(answerRadio) => {console.log(this.state.answerRadio),this.setState({answerRadio})}}
+              initial={this.dataRadioButton(this.state.screen)}
+              onPress={(answer) => {console.log(this.state.answer),this.setState({answer})}}
             />
-            {this.props.indexQuestion.includes(this.state.screen+1) ? <TouchableOpacity onPress={()=>{this._saveAnswerRadio(this.state.screen),this.props.navigation.dispatch(
-              StackActions.reset({
-                index: 0,
-                actions: [NavigationActions.navigate({ routeName: 'Question',params:{screen:this.state.screen+1} })]
-              })
-            )}}>
-        <Text>{this.state.screen}</Text>
-    </TouchableOpacity> : <TouchableOpacity onPress={()=>{this.props.navigation.replace('EndScreen')}}>
-        <Text>{this.state.screen}</Text>
-    </TouchableOpacity>}
             </View>
         )
+    }else if(this.props.dataQuestion[id].type == 'multi select'){
+      return(
+        <View>
+        <MultiSelect
+          hideTags
+          items={this.dataMultiSelect(this.state.screen)}
+          uniqueKey="id"
+          onSelectedItemsChange={this.onSelectedItemsChange}
+          selectedItems={this.state.selectedItems}
+          selectText="Pick Items"
+          altFontFamily="ProximaNova-Light"
+          tagRemoveIconColor="#CCC"
+          tagBorderColor="#CCC"
+          tagTextColor="#CCC"
+          selectedItemTextColor="#CCC"
+          selectedItemIconColor="#CCC"
+          itemTextColor="#000"
+          displayKey="name"
+          submitButtonColor="#CCC"
+          submitButtonText="Submit"
+        />
+     
+        </View>
+      )
     }
   }
-
+  onSelectedItemsChange = selectedItems => {
+    this.setState({ selectedItems,answer:selectedItems.toString()});
+    console.log(this.state.answer)
+  };
   render() {
     return (
       <View>
-               <CountDown
+        <CountDown
         size={30}
         until={this.props.dataQuestion[this.state.screen].timer * 60}
-        onFinish={() => this._saveAnswer(this.state.screen)}
+        onFinish={() => this._nextButton()}
         digitStyle={{backgroundColor: '#FFF'}}
         digitTxtStyle={{color: '#1CC625'}}
         timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
@@ -93,7 +129,11 @@ dataRadioButton(id){
       />
       <Text>{this.props.dataQuestion[this.state.screen].descriptions}</Text>
       {this._question(this.state.screen)}
-    
+      <View style={{paddingTop:50}}>
+      <TouchableOpacity onPress={()=>{this._nextButton()}}>
+    <Text>submit</Text>
+    </TouchableOpacity>
+      </View>
       </View>
     );
   }
