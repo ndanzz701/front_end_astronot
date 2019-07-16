@@ -104,6 +104,7 @@ android {
     defaultConfig {
         applicationId "com.tugasakhir"
         minSdkVersion rootProject.ext.minSdkVersion
+        missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -138,6 +139,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-fetch-blob')
     implementation project(':react-native-camera')
     implementation project(':react-native-linear-gradient')
     implementation project(':@react-native-community_async-storage')
