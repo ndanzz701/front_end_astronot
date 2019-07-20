@@ -97,7 +97,7 @@ class FormUser extends Component {
                             style={styles.image}
                             source={{uri:'https://images.vexels.com/media/users/3/152299/isolated/preview/4f63af6a16633f2bfd29063205f2882c-astronaut-flying-cartoon-by-vexels.png'}}/>
                         <Text style={styles.text1} >
-                            ASTRONOT
+                            ASTRONOT CLONE
                         </Text>
                     </View>
                     <View style={styles.content2} >

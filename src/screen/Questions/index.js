@@ -5,7 +5,7 @@ import { createAppContainer, createStackNavigator, StackActions, NavigationActio
 import {connect} from 'react-redux'
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import MultiSelect from 'react-native-multiple-select';
-
+import {Container, Header, Left, Body, Right, Button, Icon, Title,Input,Item} from 'native-base'
 class Question extends Component {
   constructor(props) {
     super(props);
@@ -41,35 +41,37 @@ dataMultiSelect(id){
 }
 
   _saveAnswer(id){
-    const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answer,"attachment":this.state.attachment}
+    const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answer,"attachment":null}
     this.props.dispatch({type:'SaveAnswer',payload:datauser})
   }
   _nextButton(){
-    if(this.props.indexQuestion.includes(this.state.screen+1)){
+    if(this.props.dataQuestion[this.state.screen].type == 'video record'){
       return(
-        this._saveAnswer(this.state.screen),this.props.navigation.dispatch(
-          StackActions.reset({
-            index: 0,
-            actions: [NavigationActions.navigate({ routeName: 'Question',params:{screen:this.state.screen+1} })]
-          })
-        )
+        this.props.navigation.navigate('Video',{screen:this.state.screen})
       )
     }else{
-      return(
-        this.props.navigation.replace('EndScreen')
-      )
+      if(this.props.indexQuestion.includes(this.state.screen+1)){
+        return(
+          this._saveAnswer(this.state.screen),this.props.navigation.dispatch(
+            StackActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: 'Question',params:{screen:this.state.screen+1} })]
+            })
+          )
+        )
+      }else{
+        return(
+          this.props.navigation.replace('EndScreen')
+        )
+      }
     }
   }
-  // _saveAnswerRadio(id){
-  //   const datauser = {"question_id":this.props.dataQuestion[id].id,"user_id":this.props.dataUser[0].id,"answer":this.state.answerRadio,"attachment":this.state.attachment}
-  //   this.props.dispatch({type:'SaveAnswer',payload:datauser})
-  // }
   _question(id){
     if(this.props.dataQuestion[id].type == 'text'){
         return(
-            <View>
-                <TextInput onChangeText={(answer)=>{this.setState({answer})}}/>
-            </View>
+          <Item regular style={{borderRadius:10}}>
+              <Input onChangeText={(answer)=>{this.setState({answer})}} multiline = {true} numberOfLines = {4} />
+          </Item>
         )
     }else if(this.props.dataQuestion[id].type == 'multiple choice'){
         console.log(this.state.value)
@@ -101,7 +103,7 @@ dataMultiSelect(id){
           itemTextColor="#000"
           displayKey="name"
           submitButtonColor="#CCC"
-          submitButtonText="Submit"
+          submitButtonText="Pilih"
         />
      
         </View>
@@ -112,11 +114,12 @@ dataMultiSelect(id){
     this.setState({ selectedItems,answer:selectedItems.toString()});
     console.log(this.state.answer)
   };
-  render() {
-    return (
-      <View>
+
+  Timer(){
+    if (this.props.dataQuestion[this.state.screen].type !== 'video record'){
+      return(
         <CountDown
-        size={30}
+        size={20}
         until={this.props.dataQuestion[this.state.screen].timer * 60}
         onFinish={() => this._nextButton()}
         digitStyle={{backgroundColor: '#FFF'}}
@@ -127,14 +130,32 @@ dataMultiSelect(id){
         timeLabels={{m: null, s: null}}
         showSeparator
       />
-      <Text>{this.props.dataQuestion[this.state.screen].descriptions}</Text>
-      {this._question(this.state.screen)}
-      <View style={{paddingTop:50}}>
-      <TouchableOpacity onPress={()=>{this._nextButton()}}>
-    <Text>submit</Text>
-    </TouchableOpacity>
-      </View>
-      </View>
+      )
+    }
+  }
+  render() {
+    return (
+      <Container>
+            <Header style={{backgroundColor:'white'}}>
+              <Right>
+              {this.Timer()}
+              </Right>
+            </Header>
+            <View>
+                <View style={{margin:15}}>
+                    <Text style={{fontWeight:'bold',fontSize:20}}>{this.props.dataQuestion[this.state.screen].descriptions}</Text>
+                </View>
+                <View>
+                {this._question(this.state.screen)}
+                </View>
+                <View style={{margin:20}}>
+                        <Button success iconRight onPress={()=>{this._nextButton()}}>
+                            <Text style={{margin:5,color:'white'}}>NEXT</Text>
+                            <Icon name='arrow-forward' />
+                        </Button>
+                </View>
+            </View>
+          </Container>
     );
   }
 }

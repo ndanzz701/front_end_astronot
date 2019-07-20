@@ -20,7 +20,7 @@ import {
   StackActions,
   NavigationActions
 } from 'react-navigation';
-import { Icon, Thumbnail } from 'native-base';
+import { Icon, Thumbnail,Button,Content,Container } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import Axios from 'axios';
 import LinearGradient from 'react-native-linear-gradient';
@@ -104,7 +104,9 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <Container>
+
+      <Content style={styles.container}>
         <LinearGradient
           start={{ x: 1.5, y: 0.3 }}
           end={{ x: 0.5, y: 1.4 }}
@@ -129,7 +131,7 @@ class Home extends Component {
                   style={styles.image}
                   source={{uri:'https://images.vexels.com/media/users/3/152299/isolated/preview/4f63af6a16633f2bfd29063205f2882c-astronaut-flying-cartoon-by-vexels.png'}}
                 />
-                <Text style={styles.text1}>ASTRONAUT</Text>
+                <Text style={styles.text1}>ASTRONAUT CLONE</Text>
               </View>
               <TouchableOpacity onPress={() => this.handleLogout()} style={styles.headerButton}>
                 <Icon name="logout" type="AntDesign" style={styles.headerButtonIcon} />
@@ -153,21 +155,31 @@ class Home extends Component {
             </View>
           </View>
         </LinearGradient>
-        <View style={styles.menuBox}>
-          <View style={styles.menuHeader}>
-            <Text style={styles.menuHeaderText}>Detail</Text>
-          </View>
-          <View style={styles.menuItem}>
-              {/* <Text>PT MENCARI CINTA SEJATI</Text>
-              <Text>- RECORD VIDEO</Text>
-              <Text>- PILIH JAWABAN</Text>
-              <Text>- TULIS JAWABAN</Text>
-              <Text>JUMLAH PERTANYAAN : 3</Text> */}
-              <TouchableOpacity onPress={()=>{this.props.navigation.replace('Question',{screen:this.props.indexQuestion[0]})}}><Text>Jawab Pertanyaan</Text></TouchableOpacity>
-
-          </View>
-        </View>
-      </View>
+        <View style={{borderTopRightRadius:80,backgroundColor: 'rgba(255,255,255,0.97)',alignItems: 'center',}}>
+                    <View style={{
+                         borderBottomColor: '#19FAC2',
+                         borderBottomWidth: 2
+                    }}>
+                        <Text style={{
+                              fontSize: 20,
+                              fontFamily: 'sans-serif-condensed',
+                              fontWeight: 'bold'
+                        }}>Detail</Text>
+                    </View>
+                    <View style={{marginTop:20}}>
+                        <Text style={{fontWeight:'bold',fontSize:30}}>
+                            PT MENCARI CINTA SEJATI
+                        </Text>
+                        <Text style={{fontSize:20}}>4 Soal</Text>
+                        <Text style={{fontSize:20}}>4 Menit Waktu Pengerjaan</Text>
+                        <Button success iconRight onPress={()=>{this.props.navigation.replace('Question',{screen:this.props.indexQuestion[0]})}}>
+                            <Text style={{margin:5,color:'white'}}>Jawab Soal</Text>
+                            <Icon name='arrow-forward' />
+                        </Button>
+                    </View>
+                </View>
+      </Content>
+      </Container>
     );
   }
 }
